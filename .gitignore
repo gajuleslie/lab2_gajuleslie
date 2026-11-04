@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.DS_Store
+
+# Generated when organizer.sh runs
+archive/
+organizer.log
