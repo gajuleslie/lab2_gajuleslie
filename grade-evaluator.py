@@ -1,26 +1,15 @@
 #!/usr/bin/env python3
-"""
-Lab 2: ALU Transcript Generator
-
-Reads a CSV file of assignment grades, validates the data, calculates the
-weighted final grade and GPA, determines PASS/FAIL status and identifies
-failed formative assignment(s) eligible for resubmission.
-
-Uses only the Python standard library (csv, math, os, sys).
-"""
 
 import csv
 import math
 import os
 import sys
 
-# ---------------------------------------------------------------------------
-# Rules for the ALU grading scheme
-# ---------------------------------------------------------------------------
+
 TOTAL_WEIGHT = 100.0
 FORMATIVE_WEIGHT = 60.0
 SUMMATIVE_WEIGHT = 40.0
-PASS_MARK = 50.0          # percentage required in EACH category
+PASS_MARK = 50.0         
 MAX_SCORE = 100.0
 GPA_SCALE = 5.0
 WEIGHT_TOLERANCE = 1e-9
@@ -28,7 +17,7 @@ WEIGHT_TOLERANCE = 1e-9
 FORMATIVE = "Formative"
 SUMMATIVE = "Summative"
 
-# Accept the short forms used in the ALU transcript (FA / SA) as well.
+
 GROUP_ALIASES = {
     "formative": FORMATIVE,
     "fa": FORMATIVE,
@@ -39,9 +28,7 @@ GROUP_ALIASES = {
 REQUIRED_COLUMNS = ("assignment", "group", "score", "weight")
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+
 def error(message):
     """Print a user-facing error message to stderr."""
     print(f"Error: {message}", file=sys.stderr)
@@ -76,9 +63,7 @@ def parse_number(text, field, row_number):
     return value
 
 
-# ---------------------------------------------------------------------------
-# File loading
-# ---------------------------------------------------------------------------
+
 def load_csv_data():
     """
     Prompt the user for a filename, check if it exists, and extract all
@@ -120,7 +105,7 @@ def load_csv_data():
         with open(filename, mode="r", encoding="utf-8-sig", newline="") as file:
             reader = csv.DictReader(file)
 
-            # Map header names (lower-cased, stripped) to the original names.
+            
             columns = {}
             for original in reader.fieldnames or []:
                 if original is not None:
@@ -150,7 +135,7 @@ def load_csv_data():
                     for name in REQUIRED_COLUMNS
                 }
 
-                # Skip completely blank lines in the CSV.
+                
                 if all(
                     value is None or str(value).strip() == ""
                     for value in raw.values()
@@ -235,9 +220,7 @@ def load_csv_data():
     return assignments
 
 
-# ---------------------------------------------------------------------------
-# Validation
-# ---------------------------------------------------------------------------
+
 def validate_scores(data):
     """Return a list of problems with assignment scores."""
     problems = []
@@ -294,9 +277,7 @@ def validate_weights(data):
     return problems
 
 
-# ---------------------------------------------------------------------------
-# Calculation and reporting
-# ---------------------------------------------------------------------------
+
 def find_resubmissions(data):
     """
     Return the name(s) of failed formative assignments (< 50%) that carry the
@@ -342,7 +323,7 @@ def evaluate_grades(data):
     formative_weight = sum(record["weight"] for record in formative)
     summative_weight = sum(record["weight"] for record in summative)
 
-    # Final weight of one assignment = score * weight / 100.
+    
     formative_earned = sum(
         record["score"] * record["weight"] / 100.0 for record in formative
     )
@@ -359,7 +340,7 @@ def evaluate_grades(data):
         formative_percent >= PASS_MARK and summative_percent >= PASS_MARK
     )
 
-    # ---- Transcript table ------------------------------------------------
+    
     name_width = max(
         [len("Assignment")] + [len(record["assignment"]) for record in data]
     )
@@ -380,7 +361,6 @@ def evaluate_grades(data):
             f"{fmt(final_weight):>12}"
         )
 
-    # ---- Summary ---------------------------------------------------------
     print()
     print(
         f"{'Formatives (' + fmt(FORMATIVE_WEIGHT) + '):':<28}"
