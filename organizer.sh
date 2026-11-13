@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-
+%
 set -uo pipefail
 
 WORK_DIR="$(pwd)"
