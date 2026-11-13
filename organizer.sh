@@ -1,15 +1,5 @@
 #!/usr/bin/env bash
-#
-# organizer.sh - archive the current grades.csv and reset the workspace.
-#
-# For every run the script:
-#   1. creates ./archive if it does not exist;
-#   2. renames grades.csv to grades_<YYYYMMDD-HHMMSS>.csv inside ./archive;
-#   3. immediately creates a new, empty grades.csv in the current directory;
-#   4. appends the operation details to ./organizer.log.
-#
-# Run it from the folder that contains grades.csv:
-#   ./organizer.sh
+
 
 set -uo pipefail
 
@@ -23,9 +13,7 @@ TIMESTAMP="$(date '+%Y%m%d-%H%M%S')"
 ARCHIVED_NAME="grades_${TIMESTAMP}.csv"
 DESTINATION="$ARCHIVE_DIR/$ARCHIVED_NAME"
 
-# ---------------------------------------------------------------------------
-# 1. Make sure the archive directory exists.
-# ---------------------------------------------------------------------------
+
 if [ -d "$ARCHIVE_DIR" ]; then
     echo "Archive directory already exists: $ARCHIVE_DIR"
 elif [ -e "$ARCHIVE_DIR" ]; then
@@ -42,9 +30,7 @@ else
     fi
 fi
 
-# ---------------------------------------------------------------------------
-# 2. Check that grades.csv exists and can be read.
-# ---------------------------------------------------------------------------
+
 if [ ! -e "$SOURCE" ]; then
     echo "Error: grades.csv was not found in $WORK_DIR." >&2
     echo "Run organizer.sh from the folder that contains grades.csv." >&2
@@ -62,17 +48,14 @@ if [ ! -r "$SOURCE" ]; then
     exit 1
 fi
 
-# Avoid overwriting an archive from the same second.
-counter=1
+
 while [ -e "$DESTINATION" ]; do
     ARCHIVED_NAME="grades_${TIMESTAMP}_${counter}.csv"
     DESTINATION="$ARCHIVE_DIR/$ARCHIVED_NAME"
     counter=$((counter + 1))
 done
 
-# ---------------------------------------------------------------------------
-# 3. Archive grades.csv.
-# ---------------------------------------------------------------------------
+
 if ! mv "$SOURCE" "$DESTINATION"; then
     echo "Error: could not move '$SOURCE' to '$DESTINATION'." >&2
     echo "Check the permissions of both folders and try again." >&2
@@ -80,9 +63,7 @@ if ! mv "$SOURCE" "$DESTINATION"; then
 fi
 echo "Archived: $SOURCE_NAME -> archive/$ARCHIVED_NAME"
 
-# ---------------------------------------------------------------------------
-# 4. Immediately reset the workspace with an empty grades.csv.
-# ---------------------------------------------------------------------------
+
 if ! touch "$SOURCE"; then
     echo "Error: the file was archived to '$DESTINATION', but a new empty" >&2
     echo "grades.csv could not be created in '$WORK_DIR'." >&2
@@ -91,9 +72,7 @@ if ! touch "$SOURCE"; then
 fi
 echo "Created new empty file: $SOURCE"
 
-# ---------------------------------------------------------------------------
-# 5. Log the operation (the log accumulates entries from every run).
-# ---------------------------------------------------------------------------
+
 LOG_ENTRY="[$(date '+%Y-%m-%d %H:%M:%S')] Archived '$SOURCE_NAME' -> 'archive/$ARCHIVED_NAME'"
 if ! printf '%s\n' "$LOG_ENTRY" >> "$LOG_FILE"; then
     echo "Error: the file was archived, but the entry could not be written" >&2
